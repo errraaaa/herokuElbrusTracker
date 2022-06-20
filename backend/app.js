@@ -1,23 +1,27 @@
 const express = require('express');
 require('dotenv').config();
-// const cors = require('cors');
-const morgan = require('morgan');
+const cors = require('cors');
 const path = require('path');
 
 const app = express();
 const PORT = 3001;
 
-app.use(express.static(path.join(process.env.PWD, 'public')));
-app.use(morgan('dev'));
-// app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+if (process.env.NODE_ENV === 'production') {
+  console.log('imhelelele');
+  app.get('/*', (req, res) => {
+    req.sendFile(path.resolve(__dirname, 'build', 'index.html'));
+  });
+}
+app.use(express.static('build'));
+// const indexRouter = require('./routes/indexRouter');
+
+app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-// const { users } = require('./db/models');
 
-// users.findAll().then(console.log);
-
-app.use((req, res) => {
-  res.status(404).send('router doesnt exist');
+// app.use('/', indexRouter);
+app.get('/*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'build', 'index.html'));
 });
 
 app.listen(PORT, () => {
